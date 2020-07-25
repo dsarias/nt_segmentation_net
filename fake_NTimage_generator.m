@@ -81,28 +81,20 @@ pixel_data=zeros(resolution,'uint8'); %will contain the pixel label data
 [image,pixel_data2]=nanoTubes_small(image,pixel_data,resolution);
 %image=nanotube_fragments(image,resolution);
 
-image=diffusion(image,resolution); %applies diffusion
+%applies initial diffusion to make area around nunchuck also affected by
+%turbulance
+image=diffusion(image,2600,0,8);
 
-%mask=zeros(resolution,'uint8');
-%mask(image>0)=1;
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%mask=double(image)./double(max(max(image)));
-
-%mask(mask>0) = mask(mask>0) + rand*0.5;
-
-%mask(mask>1)=1;
-%image = imnoise(image,'gaussian',0.5,0.5);
-%image=image.*mask
-%image=uint8(double(image).*mask);
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 final_resolution = 1200;
 image=imresize(image,[final_resolution,final_resolution]);
 
-pixel_data=pixel_data1+pixel_data2;
+image=add_nt_noise(image) %adds noise to the nanotubes so that they aren't so homogeneous
 
 noise_mean = rand*0.25';
 image = imnoise(image,'gaussian',noise_mean,noise_mean*rand*.01);
+
+
+pixel_data=pixel_data1+pixel_data2;
 
 imageout=image;
 pixel_dataout=pixel_data;
@@ -366,6 +358,23 @@ mkdir(save_path) %makes inital folder
 
 mkdir(nt_image_path)
 mkdir(pld_path)
+
+end
+
+function image=add_nt_noise(image)
+%creates a turbulance mask
+turbulance_value = round(3*rand)+1;
+turbulance_weights = turbulance(1200,turbulance_value);
+%Applies turbulance mask
+image =double(image) .* turbulance_weights/max(max(turbulance_weights));
+%Fixes values of the image to be within 8-bit ranges with a randomized
+%maximum brightness
+brightness_factor = 45 + rand*210;
+image=image/max(max(image))*brightness_factor;
+image=uint8(image); %converts image back to 
+
+%to make nanotubes mesh with the noise better - stand out less
+image=diffusion(image,1200,1,4); %applies diffusion
 
 end
 
