@@ -335,6 +335,10 @@ for i=1:n_steps
         
         brightnessLevel=(brightness-vertexBrightness)*(1-exp(-(evalue)*(i-1)))+vertexBrightness;
         image(round(y(i))-1:round(y(i))+1,round(x(i))-1:round(x(i))+1)=uint8(brightnessLevel);%marks a 2x2 area at next point with input brightness
+
+        if round(x(i))-2<1 || round(x(i))+2>resolution || round(y(i))-2<1 || round(y(i))+2>resolution
+        	continue
+    	end
         pixel_data(round(y(i))-2:round(y(i))+2,round(x(i))-2:round(x(i))+2)=uint8(250); %marks the same pixels of the arm with the label on the pixel data image
 
     %end
