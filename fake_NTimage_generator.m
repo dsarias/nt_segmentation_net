@@ -20,11 +20,11 @@ Pixel Label ID labels:
 3 - background
 %}
 
-tic
 resolution = 2600; %not the actual last resolution, only used for scaling
 
 
-
+%{
+tic
 [image,pixel_labels]=generate_image(resolution);
 
 imshow(image)
@@ -34,7 +34,7 @@ imwrite(pixel_labels,'/home/mmbl/Documents/dsa/Segmentation_NN/fakedata/fakedata
 %}
 
 
-%{
+tic
 N=100 %number of images that will be generated
 %binSize=5 %angle bin size
 %numOfBins=360/binSize %number of angles that 180 will be split into
@@ -47,10 +47,11 @@ makeFolders(save_path,nt_image_path,pld_path) %will delete old training data and
 
 
 parfor j=1:N
-	image=generate_image(resolution); %generates the artificial nanotube image
+	[image,pixel_labels]=generate_image(resolution); %generates the artificial nanotube image
 	savePath=strcat(nt_image_path,'/',num2str(j),'.tif'); %path to where the image will be saved
 	imwrite(image,savePath); %writes image to right folder
-    
+	savePath=strcat(pld_path,'/label_',num2str(j),'.tif'); %path to where the image will be saved
+    imwrite(pixel_labels,savePath); %writes image to right folder
     %{
     %progress bar display    
     clc
@@ -88,7 +89,7 @@ image=diffusion(image,2600,0,8);
 final_resolution = 1200;
 image=imresize(image,[final_resolution,final_resolution]);
 
-image=add_nt_noise(image) %adds noise to the nanotubes so that they aren't so homogeneous
+image=add_nt_noise(image); %adds noise to the nanotubes so that they aren't so homogeneous
 
 noise_mean = rand*0.25';
 image = imnoise(image,'gaussian',noise_mean,noise_mean*rand*.01);
