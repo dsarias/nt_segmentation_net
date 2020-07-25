@@ -355,8 +355,8 @@ function makeFolders(save_path,nt_image_path,pld_path)
 
 
 if exist(save_path,'dir')
-    disp("True")
-    rmdir(save_path)
+    disp("Deleting old training data")
+    system(strcat("rm -r ", save_path));
 end
 
 mkdir(save_path) %makes inital folder
